@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpeakUp Lab — Modern MOOC Platform</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #EEF2FF 0%, #F8FAFC 45%, #FFF7ED 100%);
+            --surface: rgba(255, 255, 255, 0.88);
+            --surface-solid: #FFFFFF;
+            --primary: #1D4ED8;
+            --primary-dark: #1E3A8A;
+            --accent: #F97316;
+            --accent-soft: #FFEDD5;
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --border: rgba(148, 163, 184, 0.25);
+            --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 12px 32px rgba(29, 78, 216, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            backdrop-filter: blur(14px);
+            background: rgba(255, 255, 255, 0.82);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 6px 14px rgba(249, 115, 22, 0.25);
+        }
+
+        .brand-title {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+        }
+
+        .brand-title span {
+            color: var(--accent);
+        }
+
+        .brand-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #F1F5F9;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        .progress-track {
+            width: 140px;
+            height: 8px;
+            background: #E2E8F0;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 25%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 999px;
+            transition: width 0.35s ease;
+        }
+
+        /* Layout */
+        .page-shell {
+            max-width: 1320px;
+            width: 100%;
+            margin: 28px auto 40px;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            flex: 1;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            height: fit-content;
+            position: sticky;
+            top: 84px;
+        }
+
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-heading {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .module-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .module-item {
+            width: 100%;
+            border: 1px solid #E2E8F0;
+            background: var(--surface-solid);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .module-item:hover {
+            transform: translateY(-1px);
+            border-color: #93C5FD;
+            box-shadow: 0 6px 16px rgba(29, 78, 216, 0.06);
+        }
+
+        .module-item.active {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 10px 22px rgba(29, 78, 216, 0.22);
+        }
+
+        .module-name {
+            font-size: 14px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .module-hint {
+            font-size: 12px;
+            opacity: 0.78;
+            margin-top: 2px;
+            display: block;
+        }
+
+        .pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #EFF6FF;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .module-item.active .pill {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .grade-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px dashed #E2E8F0;
+        }
+
+        .grade-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .grade-val {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .pass-chip {
+            margin-top: 10px;
+            background: #EFF6FF;
+            color: var(--primary-dark);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        /* Main Workspace */
+        .workspace {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-soft);
+            color: #C2410C;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+
+        .course-title {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        /* Video Player */
+        .player-card {
+            background: #0F172A;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.14);
+            margin-bottom: 24px;
+        }
+
+        .player-ratio {
+            position: relative;
+            width: 100%;
+            padding-bottom: 46%;
+        }
+
+        .player-ratio iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .player-footer {
+            background: #1E293B;
+            color: #E2E8F0;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+
+        .player-footer a {
+            color: #FDBA74;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .player-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Split Cards */
+        .split-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--surface-solid);
+            border: 1px solid #E2E8F0;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+        }
+
+        .panel-ai {
+            border: 1.5px solid #FDBA74;
+            background: linear-gradient(180deg, #FFFDF9 0%, #FFF7ED 100%);
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-desc {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+            color: #fff;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(234, 88, 12, 0.25);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(234, 88, 12, 0.32);
+        }
+
+        .btn-secondary {
+            background: var(--primary-dark);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            padding: 11px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.92;
+        }
+
+        .tip-box {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #9A3412;
+            background: rgba(251, 146, 60, 0.16);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .quiz-question {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            line-height: 1.45;
+        }
+
+        .choice {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 11px 13px;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            background: #F8FAFC;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 13.5px;
+            line-height: 1.45;
+            transition: all 0.15s ease;
+        }
+
+        .choice:hover {
+            border-color: #93C5FD;
+            background: #EFF6FF;
+        }
+
+        .choice input {
+            margin-top: 3px;
+            accent-color: var(--primary);
+        }
+
+        #quiz-feedback {
+            margin-top: 8px;
+            font-size: 13.5px;
+            font-weight: 700;
+            min-height: 20px;
+        }
+
+        /* Certificate Footer */
+        .cert-card {
+            margin-top: 22px;
+            background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+            border: 1px solid #A7F3D0;
+            border-radius: 18px;
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .cert-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #065F46;
+        }
+
+        .cert-sub {
+            font-size: 13px;
+            color: #047857;
+            margin-top: 2px;
+        }
+
+        /* Certificate Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.62);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 50;
+        }
+
+        .modal-backdrop.open {
+            display: flex;
+        }
+
+        .cert-modal-box {
+            max-width: 720px;
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.3);
+            position: relative;
+        }
+
+        .cert-frame {
+            border: 2px solid #F59E0B;
+            outline: 6px solid #FFFBEB;
+            border-radius: 18px;
+            padding: 32px 28px;
+            background: radial-gradient(circle at top right, #FFF7ED 0%, #FFFFFF 45%, #EFF6FF 100%);
+            text-align: center;
+        }
+
+        .cert-badge {
+            display: inline-block;
+            background: #FEF3C7;
+            color: #92400E;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 14px;
+        }
+
+        .cert-heading {
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--primary-dark);
+            letter-spacing: -0.02em;
+        }
+
+        .cert-recipient-input {
+            margin: 16px auto 8px;
+            display: block;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 800;
+            color: #0F172A;
+            border: none;
+            border-bottom: 2px solid var(--accent);
+            background: transparent;
+            padding: 6px 10px;
+            outline: none;
+        }
+
+        .cert-caption {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .cert-body-text {
+            font-size: 14px;
+            line-height: 1.65;
+            color: #334155;
+            max-width: 540px;
+            margin: 0 auto 22px;
+        }
+
+        .cert-meta-strip {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            border-top: 1px dashed #CBD5E1;
+            padding-top: 18px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .cert-sig strong {
+            display: block;
+            color: var(--text-main);
+            font-size: 13px;
+        }
+
+        .modal-actions {
+            margin-top: 18px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-ghost {
+            background: #F1F5F9;
+            color: #334155;
+            border: none;
+            border-radius: 12px;
+            padding: 11px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-ghost:hover {
+            background: #E2E8F0;
+        }
+
+        @media print {
+            body > header,
+            body > main {
+                display: none !important;
+            }
+            .modal-backdrop {
+                position: static;
+                background: none;
+                padding: 0;
+                display: block !important;
+            }
+            .cert-modal-box {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .modal-actions,
+            .cert-caption {
+                display: none !important;
+            }
+            .cert-recipient-input {
+                border-bottom-color: #94A3B8;
+            }
+        }
+
+        @media (max-width: 960px) {
+            .page-shell {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                position: static;
+            }
+            .split-grid {
+                grid-template-columns: 1fr;
+            }
+            .player-ratio {
+                padding-bottom: 56.25%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-mark">SL</div>
+            <div>
+                <div class="brand-title">SPEAKUP <span>LAB</span></div>
+                <div class="brand-sub">AI-Powered English Speaking MOOC • Future Teachers</div>
+            </div>
+        </div>
+
+        <div class="progress-wrap">
+            <span class="progress-label">Progress: <span id="prog-text">25%</span></span>
+            <div class="progress-track">
+                <div class="progress-bar" id="prog-fill"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-shell">
+        <aside class="sidebar">
+            <div class="card">
+                <div class="card-heading">4-Week Syllabus</div>
+                <div class="module-list">
+                    <button class="module-item active" onclick="loadModule(1, this)">
+                        <div>
+                            <span class="module-name">1. Classroom English</span>
+                            <span class="module-hint">ICQs &amp; Warm-ups</span>
+                        </div>
+                        <span class="pill">Week 1</span>
+                    </button>
+
+                    <button class="module-item" onclick="loadModule(2, this)">
+                        <div>
+                            <span class="module-name">2. Fluency Hacks</span>
+                            <span class="module-hint">90s No-Pause Drill</span>
+                        </div>
+                        <span class="pill">Week 2</span>
+                    </button>
+
+                    <button class="module-item" onclick="loadModule(3, this)">
+                        <div>
+                            <span class="module-name">3. Teacher Voice</span>
+                            <span class="module-hint">Stress &amp; Shadowing</span>
+                        </div>
+                        <span class="pill">Week 3</span>
+                    </button>
+
+                    <button class="module-item" onclick="loadModule(4, this)">
+                        <div>
+                            <span class="module-name">4. AI Debate Battle</span>
+                            <span class="module-hint">Golden 3 Prompts</span>
+                        </div>
+                        <span class="pill">Week 4</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-heading">Assessment Breakdown</div>
+                <div class="grade-row">
+                    <span>AI Speaking Dialogues</span>
+                    <span class="grade-val">50%</span>
+                </div>
+                <div class="grade-row">
+                    <span>Mini-Lesson Video</span>
+                    <span class="grade-val">30%</span>
+                </div>
+                <div class="grade-row">
+                    <span>Module Quizzes</span>
+                    <span class="grade-val">20%</span>
+                </div>
+                <div class="pass-chip">Minimum Passing Score: 75%</div>
+            </div>
+        </aside>
+
+        <section class="workspace">
+            <div class="meta-tag" id="mod-tag">MODULE 1 • WEEK 1 • B1–B2</div>
+            <h1 class="course-title" id="mod-title">Breaking the Ice &amp; Classroom English</h1>
+
+            <div class="player-card">
+                <div class="player-ratio">
+                    <iframe id="yt-player"
+                        src="https://www.youtube.com/embed/5MgBikgcWnY"
+                        title="Module Video Lecture"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <div class="player-footer">
+                    <span id="vid-title">Lecture: Language Acquisition &amp; Speaking Confidence</span>
+                    <a id="yt-watch-link" href="https://www.youtube.com/watch?v=5MgBikgcWnY" target="_blank" rel="noopener noreferrer">Open on YouTube ↗</a>
+                </div>
+            </div>
+
+            <div class="split-grid">
+                <div class="panel panel-ai">
+                    <div class="panel-title">🤖 AI Speaking Mentor (Edcafe)</div>
+                    <p class="panel-desc" id="ai-task-desc">
+                        <strong>"2-Minute Micro-Teaching":</strong> Launch our custom Edcafe bot and explain a classroom game rule to virtual students using clear ICQs.
+                    </p>
+                    <a href="https://app.edcafe.ai/join/WpVQnS1S6DSMB957Dif5vtw5j3iKcBF88j8VuYZ3jM9Hpgd2f8lnLTxXfDD9F8y7?sessionId=6af20d30aa6b41b4afe2334e" target="_blank" rel="noopener noreferrer" class="btn-primary">
+                        Launch Edcafe Speaking Bot ↗
+                    </a>
+                    <div class="tip-box">
+                        💡 Golden 3 Prompts: Because our bot has a turn limit, make every prompt specific and action-oriented.
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">📝 Knowledge Check</div>
+                    <p class="quiz-question" id="quiz-q">Which instruction is clearest for B1 school students?</p>
+                    <div id="quiz-options">
+                        <label class="choice">
+                            <input type="radio" name="q" onclick="checkQuiz(false)">
+                            <span>"I would be delighted if you could initiate a dialogue."</span>
+                        </label>
+                        <label class="choice">
+                            <input type="radio" name="q" onclick="checkQuiz(true)">
+                            <span>"Work in pairs. Ask 3 questions. You have 3 minutes."</span>
+                        </label>
+                    </div>
+                    <div id="quiz-feedback"></div>
+                </div>
+            </div>
+
+            <div class="cert-card">
+                <div>
+                    <div class="cert-title">🎓 SpeakUp Lab Completion Certificate</div>
+                    <div class="cert-sub">Finish all 4 speaking tasks and reach 75%+ overall score to view or print your certificate.</div>
+                </div>
+                <button class="btn-secondary" onclick="openCertModal()">
+                    Preview Certificate
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Certificate Modal -->
+    <div class="modal-backdrop" id="cert-modal" onclick="closeCertOnBackdrop(event)">
+        <div class="cert-modal-box">
+            <div class="cert-frame">
+                <div class="cert-badge">Certificate of Completion • SpeakUp Lab</div>
+                <h2 class="cert-heading">AI-Powered English Speaking for Future Teachers</h2>
+                <input
+                    type="text"
+                    class="cert-recipient-input"
+                    id="cert-name"
+                    value="Aruzhan Serikқызы (Future English Teacher)"
+                    aria-label="Recipient Name"
+                >
+                <div class="cert-caption">Click the name above to edit before printing or presenting</div>
+                <p class="cert-body-text">
+                    Has successfully completed the 4-week <strong>SpeakUp Lab MOOC</strong> program covering Classroom English, Fluency Hacks, Teacher Voice, and AI Debate practice using the Edcafe Speaking Mentor and the <em>Golden 3 Prompts</em> framework.
+                </p>
+                <div class="cert-meta-strip">
+                    <div class="cert-sig">
+                        <strong>SpeakUp Lab Team</strong>
+                        <span>EdTech &amp; ELT Methodology</span>
+                    </div>
+                    <div class="cert-sig">
+                        <strong>Score: 92% (Pass ≥ 75%)</strong>
+                        <span>AI Dialogues • Video • Quizzes</span>
+                    </div>
+                    <div class="cert-sig">
+                        <strong>Credential ID</strong>
+                        <span>SUL-2026-ELT-04</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-ghost" onclick="closeCertModal()">Close</button>
+                <button class="btn-primary" style="margin-top:0;" onclick="window.print()">Print / Save PDF 🖨️</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const modules = {
+            1: {
+                tag: "MODULE 1 • WEEK 1 • B1–B2",
+                title: "Breaking the Ice & Classroom English",
+                ytId: "5MgBikgcWnY",
+                vid: "Lecture: Language Acquisition & Speaking Confidence",
+                task: '<strong>"2-Minute Micro-Teaching":</strong> Launch our custom Edcafe bot and explain a classroom game rule to virtual students using clear ICQs.',
+                q: "Which instruction is clearest for B1 school students?",
+                opts: [
+                    { text: '"I would be delighted if you could initiate a dialogue."', correct: false },
+                    { text: '"Work in pairs. Ask 3 questions. You have 3 minutes."', correct: true }
+                ],
+                prog: "25%"
+            },
+            2: {
+                tag: "MODULE 2 • WEEK 2 • B1–B2",
+                title: "Fluency & Spontaneity Hacks",
+                ytId: "h2Z9vV5Z7P4",
+                vid: "Lecture: Speaking Fluently Without Hesitation",
+                task: '<strong>"No-Pause Challenge":</strong> Respond for 90 seconds to an unexpected classroom scenario from the Edcafe bot using at least 3 discourse markers.',
+                q: "Which phrase helps buy time naturally while thinking in English?",
+                opts: [
+                    { text: '"That’s an interesting question; let me think about that for a moment."', correct: true },
+                    { text: '"I don’t know, wait a second."', correct: false }
+                ],
+                prog: "50%"
+            },
+            3: {
+                tag: "MODULE 3 • WEEK 3 • B1–B2",
+                title: "Pronunciation, Intonation & Teacher Voice",
+                ytId: "9g0p6d2Y1xI",
+                vid: "Lecture: Pronunciation, Stress & Teacher Voice",
+                task: '<strong>"Shadowing & Drill":</strong> Shadow a short English lecture excerpt and ask the Edcafe bot for vocabulary & phrasing feedback.',
+                q: "Why is sentence stress important for an English teacher?",
+                opts: [
+                    { text: "It helps students catch key words and understand instructions easily.", correct: true },
+                    { text: "It makes the teacher speak faster.", correct: false }
+                ],
+                prog: "75%"
+            },
+            4: {
+                tag: "MODULE 4 • WEEK 4 • FINAL",
+                title: "Debates & Critical Thinking in English",
+                ytId: "R2vJbH5Q1aQ",
+                vid: "Lecture: Critical Thinking & Argumentation in English",
+                task: '<strong>"AI Debate Battle (Golden 3 Prompts)":</strong> Debate the topic <em>"Will AI replace English teachers?"</em> with the Edcafe bot within 3 focused turns.',
+                q: "Which marker best introduces a contrasting viewpoint in a debate?",
+                opts: [
+                    { text: '"Furthermore,"', correct: false },
+                    { text: '"On the other hand,"', correct: true }
+                ],
+                prog: "100%"
+            }
+        };
+
+        function loadModule(num, btn) {
+            document.querySelectorAll('.module-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const m = modules[num];
+            document.getElementById('mod-tag').innerText = m.tag;
+            document.getElementById('mod-title').innerText = m.title;
+            document.getElementById('vid-title').innerText = m.vid;
+            document.getElementById('yt-player').src = `https://www.youtube.com/embed/${m.ytId}`;
+            document.getElementById('yt-watch-link').href = `https://www.youtube.com/watch?v=${m.ytId}`;
+            document.getElementById('ai-task-desc').innerHTML = m.task;
+            document.getElementById('quiz-q').innerText = m.q;
+            document.getElementById('prog-text').innerText = m.prog;
+            document.getElementById('prog-fill').style.width = m.prog;
+            document.getElementById('quiz-feedback').innerText = "";
+
+            const optDiv = document.getElementById('quiz-options');
+            optDiv.innerHTML = "";
+            m.opts.forEach(o => {
+                optDiv.innerHTML += `
+                    <label class="choice">
+                        <input type="radio" name="q" onclick="checkQuiz(${o.correct})">
+                        <span>${o.text}</span>
+                    </label>`;
+            });
+        }
+
+        function checkQuiz(isCorrect) {
+            const fb = document.getElementById('quiz-feedback');
+            if (isCorrect) {
+                fb.style.color = "#059669";
+                fb.innerText = "✅ Correct! Clear and learner-friendly.";
+            } else {
+                fb.style.color = "#DC2626";
+                fb.innerText = "❌ Not quite. Pick the clearer classroom option.";
+            }
+        }
+
+        function openCertModal() {
+            document.getElementById('cert-modal').classList.add('open');
+        }
+
+        function closeCertModal() {
+            document.getElementById('cert-modal').classList.remove('open');
+        }
+
+        function closeCertOnBackdrop(event) {
+            if (event.target.id === 'cert-modal') {
+                closeCertModal();
+            }
+        }
+    </script>
+</body>
+</html>
